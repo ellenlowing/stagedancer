@@ -38,49 +38,34 @@ const config = {
   const rleg = pose.rightLeg;
 
   // const headDist = BodyTrackingHelper.getScale(head.topHead, head.chin).mul(config.camera_size.height.div(config.camera_size.width)).mul(0.88);
-  // const dlleg_ankle = BodyTrackingHelper.getRawDerivative(lleg.ankle);
-  // const leftAnkle = await Scene.root.findFirst('leftAnkle');
-  // const leftAnkle_emitter = await leftAnkle.findFirst('emitter0');
-
-  // leftAnkle_emitter.birthrate = dlleg_ankle.x.add(dlleg_ankle.y).mul(10).expSmooth(1000);
-
-  // Diagnostics.watch('dllegankle.x', dlleg_ankle.x);
-  // Diagnostics.watch('dllegankle.y', dlleg_ankle.y);
 
   const leftWrist = await Scene.root.findFirst('leftWrist');
   const leftWristLeader = await leftWrist.findFirst('emitterLeader');
   const emitterTransform = await Scene.root.findFirst('leftWristTransform');
   const emitter = await emitterTransform.findFirst('emitter');
 
-  Diagnostics.log(leftWristLeader.name);
+  const debugtext = await Scene.root.findFirst('speed');
+
   const t1 = leftWrist.worldTransform.toSignal();
   const t0 = t1.history(1).at(0);
 
   // emitterTransform smoothly follows left wrist of dancer
-  // emitterTransform.worldTransform.position = t1.position.expSmooth(30);
+  emitterTransform.worldTransform.position = t1.position.expSmooth(30);
 
-  // emitterTransform rotates to emit in the direction of motion
-  // const rot = t0.lookAt(t1.position).rotation;
-  // const rotValid = t1.position.sub(t0.position).magnitude().gt(0);
-  // const rotOrig = emitterTransform.worldTransform.rotation.history(1).at(0);
-  // rotValid.monitor().subscribeWithSnapshot(
-  //   {
-  //     x: rotOrig.x,
-  //     y: rotOrig.y,
-  //     z: rotOrig.z,
-  //     w: rotOrig.w,
-  //   },
-  //   ({ newValue: valid }, { x, y, z, w }) => {
-  //     emitterTransform.worldTransform.rotation = valid ? rot : Reactive.quaternion(w, x, y, z)
-  //   },
-  // );
+  // burst emitterTransform when speed maxes out
+  const dx = t1.position.sub(t0.position).expSmooth(200);
+  const speed = dx.magnitude().abs();
+  const speedNorm = speed.fromRange(0.001, 0.02);
+  const emitterScale = speedNorm.toRange(0, 0.15).clamp(0.0, 0.15);
+  const emitterPositionDelta = speedNorm.toRange(0, 0.03).clamp(0.0, 0.03);
+  const emitterBirthrate = speedNorm.toRange(50.0, 800.0).clamp(50.0, 800.0);
 
-  // // spread out emission
-  // emitter.positionDelta = Reactive.vector(0.1, 0.1, 0.1);
+  debugtext.text = speedNorm.toString();
+  Diagnostics.watch('speed', speedNorm);
 
-  // // burst emitterTransform when speed maxes out
-  // const dx = t1.position.sub(t0.position).expSmooth(200);
-  // const speed = dx.magnitude().abs();
-  // const speedNorm = speed.fromRange(0.2, 0.5);
+  // map emitter properties proportional to speed
+  emitter.scale = emitterScale.expSmooth(30);
+  emitter.positionDelta = Reactive.vector(emitterPositionDelta, emitterPositionDelta, emitterPositionDelta);
+  emitter.birthrate = emitterBirthrate;
 
 })(); 
