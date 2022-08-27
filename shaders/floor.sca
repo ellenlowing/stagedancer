@@ -1,0 +1,35 @@
+#import <gradients>
+#import <sdf>
+#import <utils>
+
+using namespace std;
+void main(std::Texture2d cameraTex, std::Texture2d mask, float flip, out vec4 Position, out vec4 Color) {
+
+  // Output the vertex position like normal
+  Position = getModelViewProjectionMatrix() * getVertexPosition();
+
+  // Do the divide by w
+  vec2 uv = fragment(Position.xy) / Position.w;
+
+  // Uv is now in the -1 to 1 range so we need to normalize it
+  uv = uv * 0.5 + 0.5;
+
+  //flip y uv so cam tex isn't upside down
+  uv.y = 1.0 - uv.y;
+
+  // sample camera texture
+  vec4 camCol = cameraTex.sample(uv);
+
+  // get mask texture
+  vec2 objUv = fragment(std::getVertexTexCoord());
+  vec4 maskCol = mask.sample(objUv);
+
+  // set alpha of output color with mask
+  float maskValue = mix(maskCol.r, 1.0-maskCol.r, flip);
+  camCol.a = maskValue;
+
+  camCol.a *= pow(1. - distance(uv, vec2(0.5)),3.);
+
+  // Output our uv's as color
+  Color = camCol;
+}
