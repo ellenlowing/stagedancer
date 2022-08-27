@@ -5,6 +5,7 @@ const CameraInfo = require('CameraInfo');
 const Reactive = require('Reactive');
 const Animation = require('Animation');
 const Diagnostics = require('Diagnostics');
+const Time = require('Time');
 
 import { emit } from 'process';
 import BodyTrackingHelper from './BodyTrackingHelper';
@@ -15,7 +16,8 @@ const height = CameraInfo.previewSize.height.div(CameraInfo.previewScreenScale);
 const config = {
   camera_size: {
       width:  width,
-      height: height},
+      height: height
+    },
   safeArea: {
       minX : width.mul(0.05),
       maxX : width.mul(0.95),
@@ -38,26 +40,82 @@ const config = {
   const lleg = pose.leftLeg;
   const rleg = pose.rightLeg;
 
+
+  const visibleY = larm.wrist.keyPoint.y.gt(0.05).and(larm.wrist.keyPoint.y.lt(0.95));
+  const visibleX = larm.wrist.keyPoint.x.gt(0.05).and(larm.wrist.keyPoint.x.lt(0.95));
+
+
   // const headDist = BodyTrackingHelper.getScale(head.topHead, head.chin).mul(config.camera_size.height.div(config.camera_size.width)).mul(0.88);
 
-  const [leftWrist, leftWristEmitterTransform] = await Promise.all([
+  const [
+    emitters,
+    leftWrist, 
+    leftWristEmitterTransform,
+    rightWrist,
+    rightWristEmitterTransform,
+    leftAnkle, 
+    leftAnkleEmitterTransform,
+    rightAnkle,
+    rightAnkleEmitterTransform
+  ] = await Promise.all([
+    Scene.root.findFirst('emitters'),
     Scene.root.findFirst('leftWrist'),
-    Scene.root.findFirst('leftWristTransform')
+    Scene.root.findFirst('leftWristTransform'),
+    Scene.root.findFirst('rightWrist'),
+    Scene.root.findFirst('rightWristTransform'),
+    Scene.root.findFirst('leftAnkle'),
+    Scene.root.findFirst('leftAnkleTransform'),
+    Scene.root.findFirst('rightAnkle'),
+    Scene.root.findFirst('rightAnkleTransform'),
   ]);
 
-  const [leftWristEmitter] = await Promise.all([
-    leftWristEmitterTransform.findFirst('emitter')
+  const [
+    leftWristEmitter,
+    rightWristEmitter,
+    leftAnkleEmitter,
+    rightAnkleEmitter,
+  ] = await Promise.all([
+    leftWristEmitterTransform.findFirst('emitter'),
+    rightWristEmitterTransform.findFirst('emitter'),
+    leftAnkleEmitterTransform.findFirst('emitter'),
+    rightAnkleEmitterTransform.findFirst('emitter'),
   ]);
 
   const debugtext = await Scene.root.findFirst('speed');
 
   const leftWristParticles = new BodyParticles({
-    name: 'leftWrist',
+    name: 'leftWristParticles',
     trackedPoint: leftWrist,
     emitterTransform: leftWristEmitterTransform,
-    emitter: leftWristEmitter
-  })
+    emitter: leftWristEmitter,
+    keyPoint: larm.wrist.keyPoint
+  });
+  const rightWristParticles = new BodyParticles({
+    name: 'rightWristParticles',
+    trackedPoint: rightWrist,
+    emitterTransform: rightWristEmitterTransform,
+    emitter: rightWristEmitter,
+    keyPoint: rarm.wrist.keyPoint
+  });
+  const leftAnkleParticles = new BodyParticles({
+    name: 'leftAnkleParticles',
+    trackedPoint: leftAnkle,
+    emitterTransform: leftAnkleEmitterTransform,
+    emitter: leftAnkleEmitter,
+    keyPoint: lleg.ankle.keyPoint
+  });
+  const rightAnkleParticles = new BodyParticles({
+    name: 'rightAnkleParticles',
+    trackedPoint: rightAnkle,
+    emitterTransform: rightAnkleEmitterTransform,
+    emitter: rightAnkleEmitter,
+    keyPoint: rleg.ankle.keyPoint
+  });
 
-  leftWristParticles.init()
-
+  leftWristParticles.init();
+  rightWristParticles.init();
+  leftAnkleParticles.init();
+  rightAnkleParticles.init();
+  
+  emitters.hidden = Time.ms.lt(3000).or(body.isTracked.not());
 })(); 

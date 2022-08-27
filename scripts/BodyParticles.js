@@ -1,6 +1,10 @@
 const Reactive = require('Reactive');
 const CameraInfo = require('CameraInfo');
 const Scene = require('Scene');
+const Diagnostics = require('Diagnostics');
+
+const width = CameraInfo.previewSize.width.div(CameraInfo.previewScreenScale);
+const height = CameraInfo.previewSize.height.div(CameraInfo.previewScreenScale);
 
 export default class BodyParticles {
   constructor({
@@ -8,11 +12,13 @@ export default class BodyParticles {
     trackedPoint,
     emitterTransform,
     emitter,
+    keyPoint
   }) {
     this.name = name
     this.trackedPoint = trackedPoint
     this.emitterTransform = emitterTransform
     this.emitter = emitter
+    this.keyPoint = keyPoint
   }
 
   init() {
@@ -30,9 +36,14 @@ export default class BodyParticles {
     const emitterPositionDelta = speedNorm.toRange(0, 0.03).clamp(0.0, 0.03);
     const emitterBirthrate = speedNorm.toRange(50.0, 800.0).clamp(50.0, 800.0);
 
+    // check if body keypoint (normalized) is within bounds
+    const visibleX = this.keyPoint.x.gt(0.05).and(this.keyPoint.x.lt(0.95));
+    const visibleY = this.keyPoint.y.gt(0.05).and(this.keyPoint.y.lt(0.95));
+
     // map emitter properties proportional to speed
     this.emitter.scale = emitterScale.expSmooth(30);
     this.emitter.positionDelta = Reactive.vector(emitterPositionDelta, emitterPositionDelta, emitterPositionDelta);
-    this.emitter.birthrate = emitterBirthrate;
+    this.emitter.birthrate = visibleX.and(visibleY).ifThenElse(emitterBirthrate, 0);
+
   }
 }
