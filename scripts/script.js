@@ -5,7 +5,10 @@ const CameraInfo = require('CameraInfo');
 const Reactive = require('Reactive');
 const Animation = require('Animation');
 const Diagnostics = require('Diagnostics');
+const Blocks = require('Blocks');
 const Time = require('Time');
+const Patches = require('Patches');
+const Materials = require('Materials');
 
 import { emit } from 'process';
 import BodyTrackingHelper from './BodyTrackingHelper';
@@ -40,15 +43,11 @@ const config = {
   const lleg = pose.leftLeg;
   const rleg = pose.rightLeg;
 
-
-  const visibleY = larm.wrist.keyPoint.y.gt(0.05).and(larm.wrist.keyPoint.y.lt(0.95));
-  const visibleX = larm.wrist.keyPoint.x.gt(0.05).and(larm.wrist.keyPoint.x.lt(0.95));
-
-
-  // const headDist = BodyTrackingHelper.getScale(head.topHead, head.chin).mul(config.camera_size.height.div(config.camera_size.width)).mul(0.88);
-
   const [
     emitters,
+    spotlightCone,
+    spotlightPlane,
+    spotlightPlaneMat,
     leftWrist, 
     leftWristEmitterTransform,
     rightWrist,
@@ -59,6 +58,9 @@ const config = {
     rightAnkleEmitterTransform
   ] = await Promise.all([
     Scene.root.findFirst('emitters'),
+    Scene.root.findFirst('spotlightCone'),
+    Scene.root.findFirst('spotlightPlane'),
+    Materials.findFirst('spotlightPlane'),
     Scene.root.findFirst('leftWrist'),
     Scene.root.findFirst('leftWristTransform'),
     Scene.root.findFirst('rightWrist'),
@@ -83,6 +85,7 @@ const config = {
 
   const debugtext = await Scene.root.findFirst('speed');
 
+  // initialize BodyParticles / emitter for different body parts
   const leftWristParticles = new BodyParticles({
     name: 'leftWristParticles',
     trackedPoint: leftWrist,
@@ -117,5 +120,29 @@ const config = {
   leftAnkleParticles.init();
   rightAnkleParticles.init();
   
+  // hide emitters if body is not tracked
   emitters.hidden = Time.ms.lt(3000).or(body.isTracked.not());
+
+  // animate opening spotlight
+  const openingTimeDriver = Animation.timeDriver({
+    durationMilliseconds: 1500,
+    loopCount: 1,
+    mirror: false
+  });
+
+  const openingSpotlightPlaneSampler = Animation.samplers.easeInOutQuad(0, 0.08);
+  const openingSpotlightPlaneAnimation = Animation.animate(openingTimeDriver, openingSpotlightPlaneSampler);
+  const openingSpotlightPlaneIntensitySampler = Animation.samplers.easeOutExpo(0., 1.);
+  const openingSpotlightPlaneIntensityAnimation = Animation.animate(openingTimeDriver, openingSpotlightPlaneIntensitySampler);
+  Patches.inputs.setScalar('spotlightPlaneRadius', openingSpotlightPlaneAnimation);
+  spotlightPlaneMat.setParameter('intensity', openingSpotlightPlaneIntensityAnimation);
+
+  const openingSpotlightConeWidthSampler = Animation.samplers.easeInOutQuad(0, 1.);
+  const openingSpotlightConeWidthAnimation = Animation.animate(openingTimeDriver, openingSpotlightConeWidthSampler);
+  const openingSpotlightConeIntensitySampler = Animation.samplers.easeOutExpo(0., 1.);
+  const openingSpotlightConeIntensityAnimation = Animation.animate(openingTimeDriver, openingSpotlightConeIntensitySampler);
+  spotlightCone.inputs.setScalar('width', openingSpotlightConeWidthAnimation);
+  spotlightCone.inputs.setScalar('intensity', openingSpotlightConeIntensityAnimation);
+
+  openingTimeDriver.start();
 })(); 

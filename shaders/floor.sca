@@ -3,7 +3,7 @@
 #import <utils>
 
 using namespace std;
-void main(std::Texture2d cameraTex, std::Texture2d mask, float flip, out vec4 Position, out vec4 Color) {
+void main(std::Texture2d cameraTex, std::Texture2d mask, float flip, float intensity, out vec4 Position, out vec4 Color) {
 
   // Output the vertex position like normal
   Position = getModelViewProjectionMatrix() * getVertexPosition();
@@ -28,8 +28,9 @@ void main(std::Texture2d cameraTex, std::Texture2d mask, float flip, out vec4 Po
   float maskValue = mix(maskCol.r, 1.0-maskCol.r, flip);
   camCol.a = maskValue;
 
+  // apply gradient falloff
   camCol.a *= pow(1. - distance(uv, vec2(0.5)),3.);
 
   // Output our uv's as color
-  Color = camCol;
+  Color = camCol * vec4(intensity);
 }
