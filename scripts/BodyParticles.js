@@ -34,7 +34,7 @@ export default class BodyParticles {
     const speedNorm = speed.fromRange(0.001, 0.02);
     const emitterScale = speedNorm.toRange(0, 0.15).clamp(0.0, 0.15);
     const emitterPositionDelta = speedNorm.toRange(0, 0.03).clamp(0.0, 0.03);
-    const emitterBirthrate = speedNorm.toRange(50.0, 800.0).clamp(50.0, 800.0);
+    const emitterBirthrate = speedNorm.toRange(50.0, 200.0).clamp(50.0, 200.0);
 
     // check if body keypoint (normalized) is within bounds
     const visibleX = this.keyPoint.x.gt(0.05).and(this.keyPoint.x.lt(0.95));

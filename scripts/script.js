@@ -55,7 +55,17 @@ const config = {
     leftAnkle, 
     leftAnkleEmitterTransform,
     rightAnkle,
-    rightAnkleEmitterTransform
+    rightAnkleEmitterTransform,
+    topHead,
+    topHeadEmitterTransform,
+    leftShoulder,
+    leftShoulderEmitterTransform,
+    rightShoulder,
+    rightShoulderEmitterTransform,
+    leftKnee,
+    leftKneeEmitterTransform,
+    rightKnee,
+    rightKneeEmitterTransform
   ] = await Promise.all([
     Scene.root.findFirst('emitters'),
     Scene.root.findFirst('spotlightCone'),
@@ -69,6 +79,16 @@ const config = {
     Scene.root.findFirst('leftAnkleTransform'),
     Scene.root.findFirst('rightAnkle'),
     Scene.root.findFirst('rightAnkleTransform'),
+    Scene.root.findFirst('topHead'),
+    Scene.root.findFirst('topHeadTransform'),
+    Scene.root.findFirst('leftShoulder'),
+    Scene.root.findFirst('leftShoulderTransform'),
+    Scene.root.findFirst('rightShoulder'),
+    Scene.root.findFirst('rightShoulderTransform'),
+    Scene.root.findFirst('leftKnee'),
+    Scene.root.findFirst('leftKneeTransform'),
+    Scene.root.findFirst('rightKnee'),
+    Scene.root.findFirst('rightKneeTransform'),
   ]);
 
   const [
@@ -76,11 +96,21 @@ const config = {
     rightWristEmitter,
     leftAnkleEmitter,
     rightAnkleEmitter,
+    topHeadEmitter,
+    leftShoulderEmitter,
+    rightShoulderEmitter,
+    leftKneeEmitter,
+    rightKneeEmitter
   ] = await Promise.all([
     leftWristEmitterTransform.findFirst('emitter'),
     rightWristEmitterTransform.findFirst('emitter'),
     leftAnkleEmitterTransform.findFirst('emitter'),
     rightAnkleEmitterTransform.findFirst('emitter'),
+    topHeadEmitterTransform.findFirst('emitter'),
+    leftShoulderEmitterTransform.findFirst('emitter'),
+    rightShoulderEmitterTransform.findFirst('emitter'),
+    leftKneeEmitterTransform.findFirst('emitter'),
+    rightKneeEmitterTransform.findFirst('emitter'),
   ]);
 
   const debugtext = await Scene.root.findFirst('speed');
@@ -114,11 +144,51 @@ const config = {
     emitter: rightAnkleEmitter,
     keyPoint: rleg.ankle.keyPoint
   });
+  const topHeadParticles = new BodyParticles({
+    name: 'topHeadParticles',
+    trackedPoint: topHead,
+    emitterTransform: topHeadEmitterTransform,
+    emitter: topHeadEmitter,
+    keyPoint: head.topHead.keyPoint
+  });
+  const leftShoulderParticles = new BodyParticles({
+    name: 'leftShoulderParticles',
+    trackedPoint: leftShoulder,
+    emitterTransform: leftShoulderEmitterTransform,
+    emitter: leftShoulderEmitter,
+    keyPoint: larm.shoulder.keyPoint
+  });
+  const rightShoulderParticles = new BodyParticles({
+    name: 'rightShoulderParticles',
+    trackedPoint: rightShoulder,
+    emitterTransform: rightShoulderEmitterTransform,
+    emitter: rightShoulderEmitter,
+    keyPoint: rarm.shoulder.keyPoint
+  });
+  const leftKneeParticles = new BodyParticles({
+    name: 'leftKneeParticles',
+    trackedPoint: leftKnee,
+    emitterTransform: leftKneeEmitterTransform,
+    emitter: leftKneeEmitter,
+    keyPoint: lleg.knee.keyPoint
+  });
+  const rightKneeParticles = new BodyParticles({
+    name: 'rightKneeParticles',
+    trackedPoint: rightKnee,
+    emitterTransform: rightKneeEmitterTransform,
+    emitter: rightKneeEmitter,
+    keyPoint: rleg.knee.keyPoint
+  });
 
   leftWristParticles.init();
   rightWristParticles.init();
   leftAnkleParticles.init();
   rightAnkleParticles.init();
+  topHeadParticles.init();
+  leftShoulderParticles.init();
+  rightShoulderParticles.init();
+  leftKneeParticles.init();
+  rightKneeParticles.init();
   
   // hide emitters if body is not tracked
   emitters.hidden = Time.ms.lt(3000).or(body.isTracked.not());
