@@ -12,13 +12,21 @@ export default class BodyParticles {
     trackedPoint,
     emitterTransform,
     emitter,
-    keyPoint
+    keyPoint,
+    scaleMax = 0.15,
+    positionDeltaMax = 0.03,
+    birthrateMin = 50,
+    birthrateMax = 200
   }) {
     this.name = name
     this.trackedPoint = trackedPoint
     this.emitterTransform = emitterTransform
     this.emitter = emitter
     this.keyPoint = keyPoint
+    this.scaleMax = scaleMax
+    this.positionDeltaMax = positionDeltaMax
+    this.birthrateMin = birthrateMin
+    this.birthrateMax = birthrateMax
   }
 
   init() {
@@ -32,9 +40,9 @@ export default class BodyParticles {
     const dx = t1.position.sub(t0.position).expSmooth(200);
     const speed = dx.magnitude().abs();
     const speedNorm = speed.fromRange(0.001, 0.02);
-    const emitterScale = speedNorm.toRange(0, 0.15).clamp(0.0, 0.15);
-    const emitterPositionDelta = speedNorm.toRange(0, 0.03).clamp(0.0, 0.03);
-    const emitterBirthrate = speedNorm.toRange(50.0, 200.0).clamp(50.0, 200.0);
+    const emitterScale = speedNorm.toRange(0, this.scaleMax).clamp(0.0, this.scaleMax);
+    const emitterPositionDelta = speedNorm.toRange(0, this.positionDeltaMax).clamp(0.0, this.positionDeltaMax);
+    const emitterBirthrate = speedNorm.toRange(this.birthrateMin, this.birthrateMax).clamp(this.birthrateMin, this.birthrateMax);
 
     // check if body keypoint (normalized) is within bounds
     const visibleX = this.keyPoint.x.gt(0.05).and(this.keyPoint.x.lt(0.95));

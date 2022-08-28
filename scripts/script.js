@@ -121,14 +121,16 @@ const config = {
     trackedPoint: leftWrist,
     emitterTransform: leftWristEmitterTransform,
     emitter: leftWristEmitter,
-    keyPoint: larm.wrist.keyPoint
+    keyPoint: larm.wrist.keyPoint,
+    scaleMax: 0.01
   });
   const rightWristParticles = new BodyParticles({
     name: 'rightWristParticles',
     trackedPoint: rightWrist,
     emitterTransform: rightWristEmitterTransform,
     emitter: rightWristEmitter,
-    keyPoint: rarm.wrist.keyPoint
+    keyPoint: rarm.wrist.keyPoint,
+    scaleMax: 0.01
   });
   const leftAnkleParticles = new BodyParticles({
     name: 'leftAnkleParticles',
