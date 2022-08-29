@@ -34,7 +34,7 @@ export default class BodyParticles {
     const t1 = this.trackedPoint.worldTransform.toSignal();
     const t0 = t1.history(1).at(0);
 
-    // emitterTransform smoothly follows left wrist of dancer
+    // emitterTransform smoothly follows body keypoint of dancer
     this.emitterTransform.worldTransform.position = t1.position.expSmooth(30);
 
     // burst emitterTransform when speed maxes out
