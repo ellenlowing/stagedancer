@@ -10,6 +10,10 @@ const Materials = require('Materials');
 
 import BodyParticles from './BodyParticles';
 
+const config = {
+  videoRecordingMode: true
+};
+
 (async function () { 
   const body = BodyTracking.body(0);
   const pose = body.pose2D;
@@ -122,6 +126,14 @@ import BodyParticles from './BodyParticles';
   spotlightCone.inputs.setScalar('width', openingSpotlightConeWidthAnimation);
   spotlightCone.inputs.setScalar('intensity', openingSpotlightConeIntensityAnimation);
 
-  Patches.inputs.setBoolean('ready', Reactive.val(true));
-  openingTimeDriver.start();
+  if(config.videoRecordingMode) {
+    CameraInfo.isRecordingVideo.onOn().take(1).subscribe(() => {
+      Patches.inputs.setBoolean('ready', Reactive.val(true));
+      openingTimeDriver.start();
+    })
+  } else {
+    Patches.inputs.setBoolean('ready', Reactive.val(true));
+    openingTimeDriver.start();
+  }
+  
 })(); 
