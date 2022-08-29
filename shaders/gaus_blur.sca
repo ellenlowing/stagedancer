@@ -1,0 +1,82 @@
+#import <sdf>
+
+export vec4 gaus_five_tap(std::Texture2d diffuse, vec2 direction) {
+
+  vec2 uv = fragment(std::getVertexTexCoord());
+  vec2 res = std::getRenderTargetSize();
+
+  vec4 colorOut = diffuse.sample( uv + (1.0/res) ) * 0.2941176471 ;
+  colorOut += diffuse.sample( uv + ((direction*1.0)/res) ) * 0.2352941176 ;
+  colorOut += diffuse.sample( uv - ((direction*1.0)/res) ) * 0.2352941176 ;
+  colorOut += diffuse.sample( uv + ((direction*2.0)/res) ) * 0.1176470588 ;
+  colorOut += diffuse.sample( uv - ((direction*2.0)/res) ) * 0.1176470588 ;
+
+  return colorOut;
+}
+
+export vec4 gaus_seven_tap(std::Texture2d diffuse, vec2 direction) {
+
+  vec2 uv = fragment(std::getVertexTexCoord());
+  vec2 res = std::getRenderTargetSize();
+
+  vec4 colorOut = diffuse.sample( uv + (1.0/res) ) * 0.251497006 ;
+  colorOut += diffuse.sample( uv + ((direction*1.0)/res) ) * 0.2095808383 ;
+  colorOut += diffuse.sample( uv - ((direction*1.0)/res) ) * 0.2095808383 ;
+  colorOut += diffuse.sample( uv + ((direction*2.0)/res) ) * 0.119760479 ;
+  colorOut += diffuse.sample( uv - ((direction*2.0)/res) ) * 0.119760479 ;
+  colorOut += diffuse.sample( uv + ((direction*3.0)/res) ) * 0.04491017964 ;
+  colorOut += diffuse.sample( uv - ((direction*3.0)/res) ) * 0.04491017964 ;
+
+  return colorOut;
+}
+
+export vec4 gaus_nine_tap(std::Texture2d diffuse, vec2 direction) {
+
+  vec2 uv = fragment(std::getVertexTexCoord());
+  vec2 res = std::getRenderTargetSize();
+
+  vec4 colorOut = diffuse.sample( uv + (1.0/res) ) * 0.2270270270 ;
+  colorOut += diffuse.sample( uv + ((direction*1.0)/res) ) * 0.1945945946 ;
+  colorOut += diffuse.sample( uv - ((direction*1.0)/res) ) * 0.1945945946 ;
+  colorOut += diffuse.sample( uv + ((direction*2.0)/res) ) * 0.1216216216 ;
+  colorOut += diffuse.sample( uv - ((direction*2.0)/res) ) * 0.1216216216 ;
+  colorOut += diffuse.sample( uv + ((direction*3.0)/res) ) * 0.0540540541 ;
+  colorOut += diffuse.sample( uv - ((direction*3.0)/res) ) * 0.0540540541 ;
+  colorOut += diffuse.sample( uv + ((direction*4.0)/res) ) * 0.0162162162 ;
+  colorOut += diffuse.sample( uv - ((direction*4.0)/res) ) * 0.0162162162 ;
+
+  return colorOut;
+}
+
+export vec4 gaus_eleven_tap(std::Texture2d diffuse, vec2 direction) {
+
+  vec2 uv = fragment(std::getVertexTexCoord());
+  vec2 res = std::getRenderTargetSize();
+
+  vec4 colorOut = diffuse.sample( uv + (1.0/res) ) * 0.2222222222 ;
+  colorOut += diffuse.sample( uv + ((direction*1.0)/res) ) * 0.1944444444 ;
+  colorOut += diffuse.sample( uv - ((direction*1.0)/res) ) * 0.1944444444 ;
+  colorOut += diffuse.sample( uv + ((direction*2.0)/res) ) * 0.1296296296 ;
+  colorOut += diffuse.sample( uv - ((direction*2.0)/res) ) * 0.1296296296 ;
+  colorOut += diffuse.sample( uv + ((direction*3.0)/res) ) * 0.06481481481 ;
+  colorOut += diffuse.sample( uv - ((direction*3.0)/res) ) * 0.06481481481 ;
+  colorOut += diffuse.sample( uv + ((direction*4.0)/res) ) * 0.02356902357 ;
+  colorOut += diffuse.sample( uv - ((direction*4.0)/res) ) * 0.02356902357 ;
+  colorOut += diffuse.sample( uv + ((direction*5.0)/res) ) * 0.005892255892 ;
+  colorOut += diffuse.sample( uv - ((direction*5.0)/res) ) * 0.005892255892 ;
+
+  return colorOut;
+}
+
+// Entry point of the shader code asset
+//
+// @return color
+vec4 main(std::Texture2d diffuse,  vec2 direction) {
+
+  vec2 uv = fragment(std::getVertexTexCoord());
+  vec2 res = std::getRenderTargetSize();
+
+  vec4 colorOut = gaus_nine_tap(diffuse,  direction);
+
+  return colorOut;
+}

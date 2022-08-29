@@ -13,7 +13,10 @@ export default class BodyParticles {
     emitterTransform,
     emitter,
     keyPoint,
-    scaleMax = 0.15,
+    speedNormMin = 0.001,
+    speedNormMax = 0.02,
+    scaleMin = 0.,
+    scaleMax = 0.025,
     positionDeltaMax = 0.03,
     birthrateMin = 50,
     birthrateMax = 200
@@ -23,6 +26,9 @@ export default class BodyParticles {
     this.emitterTransform = emitterTransform
     this.emitter = emitter
     this.keyPoint = keyPoint
+    this.speedNormMin = speedNormMin
+    this.speedNormMax = speedNormMax
+    this.scaleMin = scaleMin
     this.scaleMax = scaleMax
     this.positionDeltaMax = positionDeltaMax
     this.birthrateMin = birthrateMin
@@ -39,8 +45,8 @@ export default class BodyParticles {
     // burst emitterTransform when speed maxes out
     const dx = t1.position.sub(t0.position).expSmooth(200);
     const speed = dx.magnitude().abs();
-    const speedNorm = speed.fromRange(0.001, 0.02);
-    const emitterScale = speedNorm.toRange(0, this.scaleMax).clamp(0.0, this.scaleMax);
+    const speedNorm = speed.fromRange(this.speedNormMin, this.speedNormMax);
+    const emitterScale = speedNorm.toRange(this.scaleMin, this.scaleMax).clamp(this.scaleMin, this.scaleMax);
     const emitterPositionDelta = speedNorm.toRange(0, this.positionDeltaMax).clamp(0.0, this.positionDeltaMax);
     const emitterBirthrate = speedNorm.toRange(this.birthrateMin, this.birthrateMax).clamp(this.birthrateMin, this.birthrateMax);
 

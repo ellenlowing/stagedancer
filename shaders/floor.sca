@@ -3,7 +3,15 @@
 #import <utils>
 
 using namespace std;
-void main(std::Texture2d cameraTex, std::Texture2d mask, float flip, float intensity, out vec4 Position, out vec4 Color) {
+void main(
+  Texture2d cameraTex, 
+  Texture2d mask, 
+  Texture2d shadowTex,
+  float flip, 
+  float intensity, 
+  out vec4 Position, 
+  out vec4 Color) 
+{
 
   // Output the vertex position like normal
   Position = getModelViewProjectionMatrix() * getVertexPosition();
@@ -17,8 +25,8 @@ void main(std::Texture2d cameraTex, std::Texture2d mask, float flip, float inten
   //flip y uv so cam tex isn't upside down
   uv.y = 1.0 - uv.y;
 
-  // sample camera texture
-  vec4 camCol = cameraTex.sample(uv);
+  // sample camera texture + shadow
+  vec4 camCol = cameraTex.sample(uv) + shadowTex.sample(uv);
 
   // get mask texture
   vec2 objUv = fragment(std::getVertexTexCoord());
