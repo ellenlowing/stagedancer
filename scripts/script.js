@@ -11,7 +11,7 @@ const Materials = require('Materials');
 import BodyParticles from './BodyParticles';
 
 const config = {
-  videoRecordingMode: true
+  videoRecordingMode: false
 };
 
 (async function () { 
