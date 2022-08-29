@@ -8,7 +8,6 @@ const Patches = require('Patches');
 const Time = require('Time');
 const Materials = require('Materials');
 
-import { emit } from 'process';
 import BodyParticles from './BodyParticles';
 
 (async function () { 

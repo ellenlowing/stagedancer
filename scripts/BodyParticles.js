@@ -1,10 +1,5 @@
 const Reactive = require('Reactive');
 const CameraInfo = require('CameraInfo');
-const Scene = require('Scene');
-const Diagnostics = require('Diagnostics');
-
-const width = CameraInfo.previewSize.width.div(CameraInfo.previewScreenScale);
-const height = CameraInfo.previewSize.height.div(CameraInfo.previewScreenScale);
 
 export default class BodyParticles {
   constructor({
